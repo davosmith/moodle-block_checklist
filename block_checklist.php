@@ -126,9 +126,10 @@ class block_checklist extends block_list {
     }
 
     function get_groups_menu($cm) {
-        global $COURSE, $OUTPUT;
+        global $COURSE, $OUTPUT, $USER;
 
         if (!$groupmode = groups_get_activity_groupmode($cm)) {
+            $this->get_selected_group($cm, null, true); // Make sure all users can be seen
             return '';
         }
 
@@ -178,12 +179,23 @@ class block_checklist extends block_list {
             } else if (!isset($SESSION->checklistgroup[$cm->id])) {
                 if (isset($this->config->groupid)) {
                     $SESSION->checklistgroup[$cm->id] = $this->config->groupid;
+                } else {
+                    $SESSION->checklistgroup[$cm->id] = 0;
                 }
             }
             $groupok = (($SESSION->checklistgroup[$cm->id] == 0) && $seeall);
             $groupok = $groupok || array_key_exists($SESSION->checklistgroup[$cm->id], $allowedgroups);
             if (!$groupok) {
                 $SESSION->checklistgroup[$cm->id] = reset($allowedgroups);
+            }
+        }
+        if (empty($SESSION->checklistgroup[$cm->id])) {
+            if ($seeall) {
+                // No groups defined, but we can see all groups - return 0 => all users
+                $SESSION->checklistgroup[$cm->id] = 0;
+            } else {
+                // No groups defined and we can't access groups outside out own - return -1 => no users
+                $SESSION->checklistgroup[$cm->id] = -1;
             }
         }
 

@@ -5,6 +5,7 @@ http://moodle.org/plugins/view.php?plugin=mod_checklist
 
 ==Changes==
 
+* 2012-09-22 - Fixed bug in group selection when user is not a member of any groups
 * 2012-09-19 - Split the 3 plugins (mod / block / grade report) into separate repos for better maintenance
 * 2012-08-06 - Now able to change groups via a menu inside the block (the settings page now defines the default group to display)
 * 2012-07-07 - Tested against Moodle 2.3
