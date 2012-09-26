@@ -129,7 +129,7 @@ class block_checklist extends block_list {
         global $COURSE, $OUTPUT, $USER;
 
         if (!$groupmode = groups_get_activity_groupmode($cm)) {
-            $this->get_selected_group($cm, null, true); // Make sure all users can be seen
+            $this->get_selected_group($cm, null, true, true); // Make sure all users can be seen
             return '';
         }
 
@@ -166,7 +166,7 @@ class block_checklist extends block_list {
         return html_writer::tag('div', $out, array('class' => 'groupselector'));
     }
 
-    function get_selected_group($cm, $allowedgroups = null, $seeall = false) {
+    function get_selected_group($cm, $allowedgroups = null, $seeall = false, $forceall = false) {
         global $SESSION;
 
         if (!is_null($allowedgroups)) {
@@ -186,10 +186,15 @@ class block_checklist extends block_list {
             $groupok = (($SESSION->checklistgroup[$cm->id] == 0) && $seeall);
             $groupok = $groupok || array_key_exists($SESSION->checklistgroup[$cm->id], $allowedgroups);
             if (!$groupok) {
-                $SESSION->checklistgroup[$cm->id] = reset($allowedgroups);
+                $group = reset($allowedgroups);
+                if ($group === false) {
+                    unset($SESSION->checklistgroup[$cm->id]);
+                } else {
+                    $SESSION->checklistgroup[$cm->id] = $group;
+                }
             }
         }
-        if (empty($SESSION->checklistgroup[$cm->id])) {
+        if ($forceall || !isset($SESSION->checklistgroup[$cm->id])) {
             if ($seeall) {
                 // No groups defined, but we can see all groups - return 0 => all users
                 $SESSION->checklistgroup[$cm->id] = 0;
