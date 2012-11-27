@@ -190,7 +190,7 @@ class block_checklist extends block_list {
                 if ($group === false) {
                     unset($SESSION->checklistgroup[$cm->id]);
                 } else {
-                    $SESSION->checklistgroup[$cm->id] = $group;
+                    $SESSION->checklistgroup[$cm->id] = $group->id;
                 }
             }
         }
