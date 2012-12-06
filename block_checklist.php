@@ -17,6 +17,10 @@ class block_checklist extends block_list {
         return true;
     }
 
+    function applicable_formats() {
+        return array('course' => true, 'course-category' => false, 'site' => true);
+    }
+
     function specialization() {
         global $DB;
 
