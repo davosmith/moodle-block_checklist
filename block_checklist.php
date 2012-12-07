@@ -1,5 +1,7 @@
 <?php
 
+defined('MOODLE_INTERNAL') || die();
+
 class block_checklist extends block_list {
     function init() {
         $this->title = get_string('checklist','block_checklist');
@@ -33,7 +35,7 @@ class block_checklist extends block_list {
     }
 
     function get_content() {
-        global $CFG, $USER, $DB, $COURSE;
+        global $CFG, $USER, $DB;
 
         if ($this->content !== NULL) {
             return $this->content;

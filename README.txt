@@ -5,6 +5,7 @@ http://moodle.org/plugins/view.php?plugin=mod_checklist
 
 ==Changes==
 
+* 2012-12-07 - Moodle 2.4 compatibility fixes
 * 2012-11-27 - Fixed problems with no students appearing in certain situations
 * 2012-09-22 - Fixed bug in group selection when user is not a member of any groups
 * 2012-09-19 - Split the 3 plugins (mod / block / grade report) into separate repos for better maintenance
