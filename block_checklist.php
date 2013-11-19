@@ -87,7 +87,12 @@ class block_checklist extends block_list {
                     $users = checklist_class::filter_mentee_users($users);
                 }
                 if (!empty($users)) {
-                    $ausers = $DB->get_records_sql('SELECT u.id, u.firstname, u.lastname FROM {user} u WHERE u.id IN ('.implode(',',$users).') '.$orderby);
+                    if ($CFG->version < 2013111800) {
+                        $fields = 'u.firstname, u.lastname';
+                    } else {
+                        $fields = get_all_user_name_fields(true, 'u');
+                    }
+                    $ausers = $DB->get_records_sql("SELECT u.id, $fields FROM {user} u WHERE u.id IN (".implode(',',$users).') '.$orderby);
                 }
             }
 
@@ -119,7 +124,12 @@ class block_checklist extends block_list {
             return false;
         }
 
-        if ($chk->version < 2010041800) {
+        $version = get_config('mod_checklist', 'version');
+        if (!$version && isset($chk->version)) {
+            $version = $chk->version;
+        }
+
+        if ($version < 2010041800) {
             return false;
         }
 
@@ -132,14 +142,18 @@ class block_checklist extends block_list {
     }
 
     function get_groups_menu($cm) {
-        global $COURSE, $OUTPUT, $USER;
+        global $COURSE, $OUTPUT, $USER, $CFG;
 
         if (!$groupmode = groups_get_activity_groupmode($cm)) {
             $this->get_selected_group($cm, null, true, true); // Make sure all users can be seen
             return '';
         }
 
-        $context = get_context_instance(CONTEXT_MODULE, $cm->id);
+        if ($CFG->version < 2011120100) {
+            $context = get_context_instance(CONTEXT_MODULE, $cm->id);
+        } else {
+            $context = context_module::instance($cm->id);
+        }
         $aag = has_capability('moodle/site:accessallgroups', $context);
 
         if ($groupmode == VISIBLEGROUPS or $aag) {
