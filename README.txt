@@ -5,7 +5,8 @@ http://moodle.org/plugins/view.php?plugin=mod_checklist
 
 ==Changes==
 
-* 2013-19-11 - Moodle 2.6 compatibility fixes
+* 2014-09-08 - Match up to new checklist activity after backup & restore
+* 2013-11-19 - Moodle 2.6 compatibility fixes
 * 2012-12-07 - Moodle 2.4 compatibility fixes
 * 2012-11-27 - Fixed problems with no students appearing in certain situations
 * 2012-09-22 - Fixed bug in group selection when user is not a member of any groups
