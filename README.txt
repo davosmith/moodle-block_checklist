@@ -5,7 +5,7 @@ http://moodle.org/plugins/view.php?plugin=mod_checklist
 
 ==Changes==
 
-* 2015-01-01 - Display overview of all courses, when added to My home or Front page.
+* 2015-01-01 - Display overview of all courses, when added to My home or Front page (thanks to Richard Wallace for this)
 * 2014-09-08 - Match up to new checklist activity after backup & restore
 * 2013-11-19 - Moodle 2.6 compatibility fixes
 * 2012-12-07 - Moodle 2.4 compatibility fixes
