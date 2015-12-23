@@ -51,7 +51,7 @@ class block_checklist extends block_list {
             return $this->content;
         }
 
-        if (!isloggedin()) {
+        if (!isloggedin() || is_guest($this->context)) {
             return $this->content;
         }
 
@@ -96,6 +96,7 @@ class block_checklist extends block_list {
 
         $viewallreports = has_capability('mod/checklist:viewreports', $context);
         $viewmenteereports = has_capability('mod/checklist:viewmenteereports', $context);
+        $updateownchecklist = has_capability('mod/checklist:updateown', $context);
 
         // Show results for all users for a particular checklist.
         if ($viewallreports || $viewmenteereports) {
@@ -132,10 +133,12 @@ class block_checklist extends block_list {
                 $this->content->items = array(get_string('nousers','block_checklist'));
             }
 
-        } else {
+        } else if ($updateownchecklist) {
             $viewurl = new moodle_url('/mod/checklist/view.php', array('id'=>$cm->id));
             $link = '<a href="'.$viewurl.'" >&nbsp;';
             $this->content->items = array($link.checklist_class::print_user_progressbar($checklist->id, $USER->id, '150px', false, true).'</a>');
+        } else {
+            $this->content = null;
         }
 
         return $this->content;
