@@ -1,8 +1,8 @@
 <?php
 
 $string['checklist'] = 'Checklist';
-$string['checklist:addinstance'] = 'Add Checklist block to My Moodle page';
-$string['checklist:myaddinstance'] = 'Add new Checklist block';
+$string['checklist:addinstance'] = 'Add new Checklist block';
+$string['checklist:myaddinstance'] = 'Add Checklist block to My Moodle page';
 $string['checklistoverview'] = 'Checklist overview';
 $string['choosechecklist'] = 'Choose checklist';
 $string['choosegroup'] = 'Default group';
