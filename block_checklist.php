@@ -51,8 +51,16 @@ class block_checklist extends block_list {
             return $this->content;
         }
 
-        if (!isloggedin() || is_guest($this->context)) {
-            return $this->content;
+        if (!isloggedin()) {
+            return $this->content; // Only display if logged in.
+        }
+
+        if ($this->context->get_course_context(false)) {
+            if (is_guest($this->context)) {
+                return $this->content; // Course guests don't see the checklist block.
+            }
+        } else if (isguestuser()) {
+            return $this->content;  // Site guests don't see the checklist block.
         }
 
         $this->content = new stdClass;
