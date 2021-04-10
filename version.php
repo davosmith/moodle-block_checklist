@@ -15,7 +15,7 @@
 // along with Moodle.  If not, see <http://www.gnu.org/licenses/>.
 
 /**
- * Instance settings form
+ * Version information
  *
  * @package   block_checklist
  * @copyright 2010 Davo Smith
