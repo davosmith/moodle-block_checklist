@@ -1,0 +1,70 @@
+{{!
+    This file is part of Moodle - http://moodle.org/
+
+    Moodle is free software: you can redistribute it and/or modify
+    it under the terms of the GNU General Public License as published by
+    the Free Software Foundation, either version 3 of the License, or
+    (at your option) any later version.
+
+    Moodle is distributed in the hope that it will be useful,
+    but WITHOUT ANY WARRANTY; without even the implied warranty of
+    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+    GNU General Public License for more details.
+
+    You should have received a copy of the GNU General Public License
+    along with Moodle.  If not, see <http://www.gnu.org/licenses/>.
+}}
+{{!
+    @template block_checklist/mobile_view_overview
+
+    Display single checklist block in the mobile app
+
+    Context variables required for this template:
+    * title, showallusers, showsingleuser
+
+    Example context (json):
+    {
+        "title": "First checklist",
+        "showallusers": false,
+        "showsingleuser": true,
+        "viewurl": "SITEURL/mod/checklist/view.php?id=1",
+        "progress": 50
+    }
+}}
+{{=<% %>=}}
+<ion-item-divider class="ion-text-wrap" [sticky]="true">
+    <ion-label>
+        <h2><% title %></h2>
+    </ion-label>
+</ion-item-divider>
+
+<%#showsingleuser%>
+<ion-item button class="ion-text-wrap" href="<% viewurl %>" core-link [capture]="true" detail="true">
+    <ion-label>
+        <core-progress-bar progress="<% progress %>"></core-progress-bar>
+    </ion-label>
+</ion-item>
+<%/showsingleuser%>
+
+<%#showallusers%>
+<core-group-selector *ngIf="CONTENT_OTHERDATA.groupinfo?.groups?.length > 1" [groupInfo]="CONTENT_OTHERDATA.groupinfo"
+    [(selected)]="CONTENT_OTHERDATA.groupid">
+</core-group-selector>
+
+<ng-container *ngIf="CONTENT_OTHERDATA.groupsusers[CONTENT_OTHERDATA.groupid] &&
+    CONTENT_OTHERDATA.groupsusers[CONTENT_OTHERDATA.groupid].length">
+    <ion-item *ngFor="let user of CONTENT_OTHERDATA.groupsusers[CONTENT_OTHERDATA.groupid]" button class="ion-text-wrap"
+        [href]="user.viewurl" core-link [capture]="true" detail="true">
+        <ion-label>
+            {{ user.fullname }} <core-progress-bar *ngIf="user.progress !== null" [progress]="user.progress"></core-progress-bar>
+        </ion-label>
+    </ion-item>
+</ng-container>
+
+<ion-item class="ion-text-wrap" *ngIf="!CONTENT_OTHERDATA.groupsusers[CONTENT_OTHERDATA.groupid] ||
+    !CONTENT_OTHERDATA.groupsusers[CONTENT_OTHERDATA.groupid].length">
+    <ion-label>
+        {{ 'plugin.block_checklist.nousers' | translate }}
+    </ion-label>
+</ion-item>
+<%/showallusers%>

@@ -124,7 +124,7 @@ class block_checklist extends block_list {
         $this->content->footer = '';
         $this->content->icons = [];
 
-        if (!$this->import_checklist_plugin()) {
+        if (!self::import_checklist_plugin()) {
             $this->content->items = [get_string('nochecklistplugin', 'block_checklist')];
             return $this->content;
         }
@@ -169,34 +169,13 @@ class block_checklist extends block_list {
 
         // Show results for all users for a particular checklist.
         if ($viewallreports || $viewmenteereports) {
-            $ausers = false;
-
             // Add the groups selector to the footer.
             $this->content->footer = $this->get_groups_menu($cm);
             $showgroup = $this->get_selected_group($cm);
 
-            $users = get_users_by_capability($this->context, 'mod/checklist:updateown', 'u.id', '', '', '', $showgroup, '', false);
-            if ($users) {
-                $users = array_keys($users);
-                if (!$viewallreports) { // Can only see reports for their mentees.
-                    $users = checklist_class::filter_mentee_users($users);
-                }
-                if (!empty($users)) {
-                    if (class_exists('\core_user\fields')) {
-                        $namesql = \core_user\fields::for_name()->get_sql('', true);
-                    } else {
-                        $namesql = (object)[
-                            'selects' => ','.get_all_user_name_fields(true),
-                            'joins' => '',
-                            'params' => [],
-                            'mappings' => [],
-                        ];
-                    }
-                    $ausers = $DB->get_records_list('user', 'id', $users, 'firstname ASC', "id $namesql->selects");
-                }
-            }
+            $ausers = self::get_single_checklist_users($this->context, $showgroup, $viewallreports);
 
-            if ($ausers) {
+            if (!empty($ausers)) {
                 $this->content->items = [];
                 $reporturl = new moodle_url('/mod/checklist/report.php', ['id' => $cm->id]);
                 foreach ($ausers as $auser) {
@@ -221,6 +200,42 @@ class block_checklist extends block_list {
     }
 
     /**
+     * Get the users for a single checklist view.
+     *
+     * @param stdClass $context Context.
+     * @param string|int $showgroup Group to use.
+     * @param bool $viewallreports Whether current user can view all reports.
+     * @return array
+     * @throws dml_exception
+     */
+    public static function get_single_checklist_users($context, $showgroup, $viewallreports) {
+        global $DB;
+
+        $users = get_users_by_capability($context, 'mod/checklist:updateown', 'u.id', '', '', '', $showgroup, '', false);
+        if ($users) {
+            $users = array_keys($users);
+            if (!$viewallreports) { // Can only see reports for their mentees.
+                $users = checklist_class::filter_mentee_users($users);
+            }
+            if (!empty($users)) {
+                if (class_exists('\core_user\fields')) {
+                    $namesql = \core_user\fields::for_name()->get_sql('', true);
+                } else {
+                    $namesql = (object)[
+                        'selects' => ','.get_all_user_name_fields(true),
+                        'joins' => '',
+                        'params' => [],
+                        'mappings' => [],
+                    ];
+                }
+                $users = $DB->get_records_list('user', 'id', $users, 'firstname ASC', "id $namesql->selects");
+            }
+        }
+
+        return $users;
+    }
+
+    /**
      * Output an overview of all checklists
      * @return stdObject|null
      * @throws coding_exception
@@ -228,7 +243,7 @@ class block_checklist extends block_list {
      * @throws moodle_exception
      */
     protected function show_checklist_overview() {
-        global $COURSE, $DB;
+        global $COURSE;
 
         $allcourses = ($COURSE->format === 'site');
         if ($allcourses) {
@@ -242,10 +257,40 @@ class block_checklist extends block_list {
             return $this->content;
         }
 
+        $checklists = self::get_checklists_for_overview($mycourses);
+
+        $this->content->items = [];
+
+        foreach ($checklists as $checklist) {
+            $viewurl = new moodle_url('/mod/checklist/view.php', ['id' => $checklist->cmid]);
+            if ($allcourses) {
+                $this->content->items[] = html_writer::tag('h4', $checklist->shortname);
+            }
+            $info = format_string($checklist->name);
+            $info .= html_writer::empty_tag('br', ['class' => 'clearer']);
+            $info .= $this->print_user_progressbar($checklist);
+            $this->content->items[] = html_writer::link($viewurl, $info);
+        }
+
+        return $this->content;
+    }
+
+    /**
+     * Get the checklists list for overview.
+     *
+     * @param array $courses Courses to get the checklists from.
+     * @return array Checklists.
+     * @throws coding_exception
+     * @throws dml_exception
+     */
+    public static function get_checklists_for_overview($courses) {
+        global $DB;
+
         $courseids = [];
-        foreach ($mycourses as $id => $course) {
+        foreach ($courses as $id => $course) {
             $courseids[] = $id;
         }
+
         list($inorequal, $params) = $DB->get_in_or_equal($courseids, SQL_PARAMS_NAMED);
         $params['moduleid'] = $DB->get_field('modules', 'id', ['name' => 'checklist']);
         $sql = "SELECT ch.*, c.shortname, cm.id AS cmid
@@ -263,23 +308,10 @@ class block_checklist extends block_list {
             }
         }
 
-        $this->content->items = [];
+        $checklists = self::get_user_progress($checklists);
+        $checklists = self::sort_checklists($checklists, 20);
 
-        $checklists = $this->get_user_progress($checklists);
-        $checklists = $this->sort_checklists($checklists, 20);
-
-        foreach ($checklists as $checklist) {
-            $viewurl = new moodle_url('/mod/checklist/view.php', ['id' => $checklist->cmid]);
-            if ($allcourses) {
-                $this->content->items[] = html_writer::tag('h4', $checklist->shortname);
-            }
-            $info = format_string($checklist->name);
-            $info .= html_writer::empty_tag('br', ['class' => 'clearer']);
-            $info .= $this->print_user_progressbar($checklist);
-            $this->content->items[] = html_writer::link($viewurl, $info);
-        }
-
-        return $this->content;
+        return $checklists;
     }
 
     /**
@@ -288,7 +320,7 @@ class block_checklist extends block_list {
      * @param object[] $checklists
      * @return object[]
      */
-    protected function get_user_progress($checklists) {
+    protected static function get_user_progress($checklists) {
         global $DB, $USER, $CFG;
 
         if (empty($checklists)) {
@@ -370,7 +402,7 @@ class block_checklist extends block_list {
      * @param int $maxdisplay only return this many checklists
      * @return object[] the sorted checklists
      */
-    protected function sort_checklists($checklists, $maxdisplay) {
+    protected static function sort_checklists($checklists, $maxdisplay) {
         uasort($checklists, function ($a, $b) {
             if ($a->percent == $b->percent) {
                 return 0; // Same, so no defined sort order.
@@ -424,7 +456,7 @@ class block_checklist extends block_list {
      * @return bool
      * @throws dml_exception
      */
-    protected function import_checklist_plugin() {
+    public static function import_checklist_plugin() {
         global $CFG, $DB;
 
         $chk = $DB->get_record('modules', array('name' => 'checklist'));
