@@ -37,5 +37,5 @@ $addons = [
             ['checklist', 'block_checklist'],
             ['nousers', 'block_checklist'],
         ],
-    ]
+    ],
 ];

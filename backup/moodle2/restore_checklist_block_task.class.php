@@ -38,7 +38,7 @@ class restore_checklist_block_task extends restore_block_task {
      * @return array
      */
     public function get_fileareas() {
-        return array(); // No fileareas.
+        return []; // No fileareas.
     }
 
     /**
@@ -46,7 +46,7 @@ class restore_checklist_block_task extends restore_block_task {
      * @return array
      */
     public function get_configdata_encoded_attributes() {
-        return array(); // No special handling of configdata.
+        return []; // No special handling of configdata.
     }
 
     /**
@@ -67,7 +67,7 @@ class restore_checklist_block_task extends restore_block_task {
         $blockid = $this->get_blockid();
 
         // Extract block configdata and update it to point to the new checklist.
-        if ($configdata = $DB->get_field('block_instances', 'configdata', array('id' => $blockid))) {
+        if ($configdata = $DB->get_field('block_instances', 'configdata', ['id' => $blockid])) {
             $config = base64_decode($configdata);
             if (function_exists('unserialize_object')) {
                 $config = unserialize_object($config);
@@ -76,14 +76,15 @@ class restore_checklist_block_task extends restore_block_task {
             }
             if (!empty($config->checklistid)) {
                 // Get checklist mapping and replace it in config.
-                $checklistmap = restore_dbops::get_backup_ids_record($this->get_restoreid(), 'checklist', $config->checklistid);
+                $checklistmap = restore_dbops::get_backup_ids_record($this->get_restoreid(), 'checklist',
+                                                                     $config->checklistid);
                 if ($checklistmap) {
                     $config->checklistid = $checklistmap->newitemid;
                 } else {
                     $config->checklistid = 0;
                 }
                 $configdata = base64_encode(serialize($config));
-                $DB->set_field('block_instances', 'configdata', $configdata, array('id' => $blockid));
+                $DB->set_field('block_instances', 'configdata', $configdata, ['id' => $blockid]);
             }
         }
     }
@@ -93,7 +94,7 @@ class restore_checklist_block_task extends restore_block_task {
      * @return array
      */
     public static function define_decode_contents() {
-        return array(); // Nothing to do.
+        return []; // Nothing to do.
     }
 
     /**
@@ -101,6 +102,6 @@ class restore_checklist_block_task extends restore_block_task {
      * @return array
      */
     public static function define_decode_rules() {
-        return array(); // Nothing to do.
+        return []; // Nothing to do.
     }
 }

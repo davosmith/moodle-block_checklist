@@ -63,7 +63,7 @@ class block_checklist extends block_list {
      * @return array
      */
     public function applicable_formats() {
-        return array('course' => true, 'course-category' => false, 'site' => true, 'my' => true);
+        return ['course' => true, 'course-category' => false, 'site' => true, 'my' => true];
     }
 
     /**
@@ -77,7 +77,7 @@ class block_checklist extends block_list {
         if (!empty($this->config->checklistoverview)) {
             $this->title = get_string('checklistoverview', 'block_checklist');
         } else if (!empty($this->config->checklistid)) {
-            $checklist = $DB->get_record('checklist', array('id' => $this->config->checklistid));
+            $checklist = $DB->get_record('checklist', ['id' => $this->config->checklistid]);
             if ($checklist) {
                 $this->title = s($checklist->name);
             }
@@ -180,7 +180,8 @@ class block_checklist extends block_list {
                 $reporturl = new moodle_url('/mod/checklist/report.php', ['id' => $cm->id]);
                 foreach ($ausers as $auser) {
                     $link = '<a href="'.$reporturl->out(true, ['studentid' => $auser->id]).'" >&nbsp;';
-                    $progressbar = checklist_class::print_user_progressbar($checklist->id, $auser->id, '50px', false, true);
+                    $progressbar = checklist_class::print_user_progressbar($checklist->id, $auser->id, '50px', false,
+                                                                           true);
                     $this->content->items[] = $link.fullname($auser).$progressbar.'</a>';
                 }
             } else {
@@ -188,7 +189,7 @@ class block_checklist extends block_list {
             }
 
         } else if ($updateownchecklist) {
-            $viewurl = new moodle_url('/mod/checklist/view.php', array('id' => $cm->id));
+            $viewurl = new moodle_url('/mod/checklist/view.php', ['id' => $cm->id]);
             $link = '<a href="'.$viewurl.'" >&nbsp;';
             $progressbar = checklist_class::print_user_progressbar($checklist->id, $USER->id, '150px', false, true);
             $this->content->items = [$link.$progressbar.'</a>'];
@@ -211,7 +212,8 @@ class block_checklist extends block_list {
     public static function get_single_checklist_users($context, $showgroup, $viewallreports) {
         global $DB;
 
-        $users = get_users_by_capability($context, 'mod/checklist:updateown', 'u.id', '', '', '', $showgroup, '', false);
+        $users = get_users_by_capability($context, 'mod/checklist:updateown', 'u.id', '', '', '', $showgroup, '',
+                                         false);
         if ($users) {
             $users = array_keys($users);
             if (!$viewallreports) { // Can only see reports for their mentees.
@@ -291,7 +293,7 @@ class block_checklist extends block_list {
             $courseids[] = $id;
         }
 
-        list($inorequal, $params) = $DB->get_in_or_equal($courseids, SQL_PARAMS_NAMED);
+        [$inorequal, $params] = $DB->get_in_or_equal($courseids, SQL_PARAMS_NAMED);
         $params['moduleid'] = $DB->get_field('modules', 'id', ['name' => 'checklist']);
         $sql = "SELECT ch.*, c.shortname, cm.id AS cmid
                     FROM {checklist} ch
@@ -328,7 +330,7 @@ class block_checklist extends block_list {
         }
 
         // Get all the items for all the checklists.
-        list($csql, $params) = $DB->get_in_or_equal(array_keys($checklists), SQL_PARAMS_NAMED);
+        [$csql, $params] = $DB->get_in_or_equal(array_keys($checklists), SQL_PARAMS_NAMED);
         $select = "checklist $csql AND userid = 0 AND itemoptional = ".CHECKLIST_OPTIONAL_NO." AND hidden = ".CHECKLIST_HIDDEN_NO;
         $items = $DB->get_records_select('checklist_item', $select, $params, 'checklist', 'id, checklist, groupingid');
         if (!$items) {
@@ -336,7 +338,7 @@ class block_checklist extends block_list {
         }
 
         // Get all the checks for this user for these items.
-        list($isql, $params) = $DB->get_in_or_equal(array_keys($items), SQL_PARAMS_NAMED);
+        [$isql, $params] = $DB->get_in_or_equal(array_keys($items), SQL_PARAMS_NAMED);
         $params['userid'] = $USER->id;
         $checkmarks = $DB->get_records_select('checklist_check', "item $isql AND userid = :userid", $params, 'item',
                                               'item, usertimestamp, teachermark');
@@ -459,7 +461,7 @@ class block_checklist extends block_list {
     public static function import_checklist_plugin() {
         global $CFG, $DB;
 
-        $chk = $DB->get_record('modules', array('name' => 'checklist'));
+        $chk = $DB->get_record('modules', ['name' => 'checklist']);
         if (!$chk) {
             return false;
         }
@@ -509,7 +511,7 @@ class block_checklist extends block_list {
 
         $selected = $this->get_selected_group($cm, $allowedgroups, $seeall);
 
-        $groupsmenu = array();
+        $groupsmenu = [];
         if (empty($allowedgroups) || $seeall) {
             $groupsmenu[0] = get_string('allparticipants');
         }
@@ -519,14 +521,14 @@ class block_checklist extends block_list {
             }
         }
 
-        $baseurl = new moodle_url('/course/view.php', array('id' => $COURSE->id));
+        $baseurl = new moodle_url('/course/view.php', ['id' => $COURSE->id]);
         if (count($groupsmenu) <= 1) {
             return '';
         }
 
         $select = new single_select($baseurl, 'group', $groupsmenu, $selected, null, 'selectgroup');
         $out = $OUTPUT->render($select);
-        return html_writer::tag('div', $out, array('class' => 'groupselector'));
+        return html_writer::tag('div', $out, ['class' => 'groupselector']);
     }
 
     /**
@@ -543,7 +545,7 @@ class block_checklist extends block_list {
 
         if ($allowedgroups !== null) {
             if (!isset($SESSION->checklistgroup)) {
-                $SESSION->checklistgroup = array();
+                $SESSION->checklistgroup = [];
             }
             $change = optional_param('group', -1, PARAM_INT);
             if ($change !== -1) {

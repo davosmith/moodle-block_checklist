@@ -127,7 +127,7 @@ class mobile {
                 $groupsusers[$group->id] = [];
 
                 foreach ($ausers as $auser) {
-                    list($ticked, $total) = \checklist_class::get_user_progress($checklist->id, $auser->id);
+                    [$ticked, $total] = \checklist_class::get_user_progress($checklist->id, $auser->id);
 
                     $groupsusers[$group->id][] = (object)[
                         'fullname' => fullname($auser),
@@ -140,7 +140,7 @@ class mobile {
         } else if ($data['showsingleuser']) {
             $data['viewurl'] = new \moodle_url('/mod/checklist/view.php', ['id' => $cm->id]);
 
-            list($ticked, $total) = \checklist_class::get_user_progress($checklist->id, $USER->id);
+            [$ticked, $total] = \checklist_class::get_user_progress($checklist->id, $USER->id);
             $data['progress'] = $total ? $ticked * 100.0 / $total : -1;
         }
 
