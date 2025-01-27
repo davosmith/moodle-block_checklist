@@ -526,7 +526,7 @@ class block_checklist extends block_list {
             return '';
         }
 
-        $select = new single_select($baseurl, 'group', $groupsmenu, $selected, null, 'selectgroup');
+        $select = new single_select($baseurl, 'group', $groupsmenu, $selected, null);
         $out = $OUTPUT->render($select);
         return html_writer::tag('div', $out, ['class' => 'groupselector']);
     }
