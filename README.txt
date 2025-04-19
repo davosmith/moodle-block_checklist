@@ -5,6 +5,7 @@ http://moodle.org/plugins/view.php?plugin=mod_checklist
 
 ==Changes==
 
+* 2025-04-19 - 4.0.0.0 - M5.0 compatibility fixes, drop support for M3.11 and below
 * 2024-10-19 - 3.4.3.2 - minor M4.5 compatibility fixes, strip out language translations already in AMOS
 * 2024-04-04 - 3.4.3.1 - minor M4.4 compatibility fixes
 * 2024-01-20 - 3.4.3.0 - now works with Moodle Mobile App, thanks to Dani from Moodle HQ for your work on this
