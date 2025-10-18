@@ -76,8 +76,11 @@ class restore_checklist_block_task extends restore_block_task {
             }
             if (!empty($config->checklistid)) {
                 // Get checklist mapping and replace it in config.
-                $checklistmap = restore_dbops::get_backup_ids_record($this->get_restoreid(), 'checklist',
-                                                                     $config->checklistid);
+                $checklistmap = restore_dbops::get_backup_ids_record(
+                    $this->get_restoreid(),
+                    'checklist',
+                    $config->checklistid
+                );
                 if ($checklistmap) {
                     $config->checklistid = $checklistmap->newitemid;
                 } else {

@@ -179,20 +179,24 @@ class block_checklist extends block_list {
                 $this->content->items = [];
                 $reporturl = new moodle_url('/mod/checklist/report.php', ['id' => $cm->id]);
                 foreach ($ausers as $auser) {
-                    $link = '<a href="'.$reporturl->out(true, ['studentid' => $auser->id]).'" >&nbsp;';
-                    $progressbar = checklist_class::print_user_progressbar($checklist->id, $auser->id, '50px', false,
-                                                                           true);
-                    $this->content->items[] = $link.fullname($auser).$progressbar.'</a>';
+                    $link = '<a href="' . $reporturl->out(true, ['studentid' => $auser->id]) . '" >&nbsp;';
+                    $progressbar = checklist_class::print_user_progressbar(
+                        $checklist->id,
+                        $auser->id,
+                        '50px',
+                        false,
+                        true
+                    );
+                    $this->content->items[] = $link . fullname($auser) . $progressbar . '</a>';
                 }
             } else {
                 $this->content->items = [get_string('nousers', 'block_checklist')];
             }
-
         } else if ($updateownchecklist) {
             $viewurl = new moodle_url('/mod/checklist/view.php', ['id' => $cm->id]);
-            $link = '<a href="'.$viewurl.'" >&nbsp;';
+            $link = '<a href="' . $viewurl . '" >&nbsp;';
             $progressbar = checklist_class::print_user_progressbar($checklist->id, $USER->id, '150px', false, true);
-            $this->content->items = [$link.$progressbar.'</a>'];
+            $this->content->items = [$link . $progressbar . '</a>'];
         } else {
             $this->content = null;
         }
@@ -212,8 +216,17 @@ class block_checklist extends block_list {
     public static function get_single_checklist_users($context, $showgroup, $viewallreports) {
         global $DB;
 
-        $users = get_users_by_capability($context, 'mod/checklist:updateown', 'u.id', '', '', '', $showgroup, '',
-                                         false);
+        $users = get_users_by_capability(
+            $context,
+            'mod/checklist:updateown',
+            'u.id',
+            '',
+            '',
+            '',
+            $showgroup,
+            '',
+            false
+        );
         if ($users) {
             $users = array_keys($users);
             if (!$viewallreports) { // Can only see reports for their mentees.
@@ -224,7 +237,7 @@ class block_checklist extends block_list {
                     $namesql = \core_user\fields::for_name()->get_sql('', true);
                 } else {
                     $namesql = (object)[
-                        'selects' => ','.get_all_user_name_fields(true),
+                        'selects' => ',' . get_all_user_name_fields(true),
                         'joins' => '',
                         'params' => [],
                         'mappings' => [],
@@ -331,7 +344,7 @@ class block_checklist extends block_list {
 
         // Get all the items for all the checklists.
         [$csql, $params] = $DB->get_in_or_equal(array_keys($checklists), SQL_PARAMS_NAMED);
-        $select = "checklist $csql AND userid = 0 AND itemoptional = ".CHECKLIST_OPTIONAL_NO." AND hidden = ".CHECKLIST_HIDDEN_NO;
+        $select = "checklist $csql AND userid = 0 AND itemoptional = " . CHECKLIST_OPTIONAL_NO . " AND hidden = " . CHECKLIST_HIDDEN_NO;
         $items = $DB->get_records_select('checklist_item', $select, $params, 'checklist', 'id, checklist, groupingid');
         if (!$items) {
             return $checklists;
@@ -340,8 +353,13 @@ class block_checklist extends block_list {
         // Get all the checks for this user for these items.
         [$isql, $params] = $DB->get_in_or_equal(array_keys($items), SQL_PARAMS_NAMED);
         $params['userid'] = $USER->id;
-        $checkmarks = $DB->get_records_select('checklist_check', "item $isql AND userid = :userid", $params, 'item',
-                                              'item, usertimestamp, teachermark');
+        $checkmarks = $DB->get_records_select(
+            'checklist_check',
+            "item $isql AND userid = :userid",
+            $params,
+            'item',
+            'item, usertimestamp, teachermark'
+        );
 
         // If 'groupmembersonly' is enabled, get a list of groupings the user is a member of.
         $groupings = !empty($CFG->enablegroupmembersonly) && !empty($CFG->enablegroupmembersonly);
@@ -444,9 +462,9 @@ class block_checklist extends block_list {
         $percent = $checklist->checked * 100.0 / $checklist->totalitems;
         $width = '150px';
 
-        $output = '<div class="checklist_progress_outer" style="width: '.$width.';" >';
-        $output .= '<div class="checklist_progress_inner" style="width:'.
-            $percent.'%; background-image: url('.$OUTPUT->image_url('progress', 'checklist').');" >&nbsp;</div>';
+        $output = '<div class="checklist_progress_outer" style="width: ' . $width . ';" >';
+        $output .= '<div class="checklist_progress_inner" style="width:' .
+            $percent . '%; background-image: url(' . $OUTPUT->image_url('progress', 'checklist') . ');" >&nbsp;</div>';
         $output .= '</div>';
         $output .= '<br style="clear:both;" />';
 
@@ -475,11 +493,11 @@ class block_checklist extends block_list {
             return false;
         }
 
-        if (!file_exists($CFG->dirroot.'/mod/checklist/locallib.php')) {
+        if (!file_exists($CFG->dirroot . '/mod/checklist/locallib.php')) {
             return false;
         }
 
-        require_once($CFG->dirroot.'/mod/checklist/locallib.php');
+        require_once($CFG->dirroot . '/mod/checklist/locallib.php');
         return true;
     }
 

@@ -24,7 +24,6 @@ namespace block_checklist\output;
  * @license   http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 class mobile {
-
     /**
      * Returns the block checklist view for the mobile app.
      *
@@ -136,7 +135,6 @@ class mobile {
                     ];
                 }
             }
-
         } else if ($data['showsingleuser']) {
             $data['viewurl'] = new \moodle_url('/mod/checklist/view.php', ['id' => $cm->id]);
 
@@ -287,5 +285,4 @@ class mobile {
             ],
         ];
     }
-
 }
