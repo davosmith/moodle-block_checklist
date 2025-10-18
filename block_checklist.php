@@ -344,7 +344,8 @@ class block_checklist extends block_list {
 
         // Get all the items for all the checklists.
         [$csql, $params] = $DB->get_in_or_equal(array_keys($checklists), SQL_PARAMS_NAMED);
-        $select = "checklist $csql AND userid = 0 AND itemoptional = " . CHECKLIST_OPTIONAL_NO . " AND hidden = " . CHECKLIST_HIDDEN_NO;
+        $select = "checklist $csql AND userid = 0 AND itemoptional = " . CHECKLIST_OPTIONAL_NO . " AND hidden = " .
+            CHECKLIST_HIDDEN_NO;
         $items = $DB->get_records_select('checklist_item', $select, $params, 'checklist', 'id, checklist, groupingid');
         if (!$items) {
             return $checklists;
