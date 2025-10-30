@@ -151,7 +151,7 @@ class block_checklist extends block_list {
      * @throws moodle_exception
      */
     protected function show_single_checklist($checklistid) {
-        global $DB, $USER;
+        global $COURSE, $DB, $USER;
 
         if (!$checklist = $DB->get_record('checklist', ['id' => $checklistid])) {
             $this->content->items = [get_string('nochecklist', 'block_checklist')];
@@ -193,10 +193,16 @@ class block_checklist extends block_list {
                 $this->content->items = [get_string('nousers', 'block_checklist')];
             }
         } else if ($updateownchecklist) {
-            $viewurl = new moodle_url('/mod/checklist/view.php', ['id' => $cm->id]);
-            $link = '<a href="' . $viewurl . '" >&nbsp;';
-            $progressbar = checklist_class::print_user_progressbar($checklist->id, $USER->id, '150px', false, true);
-            $this->content->items = [$link . $progressbar . '</a>'];
+            if (empty($this->config->embedchecklist)) {
+                $viewurl = new moodle_url('/mod/checklist/view.php', ['id' => $cm->id]);
+                $link = '<a href="' . $viewurl . '" >&nbsp;';
+                $progressbar = checklist_class::print_user_progressbar($checklist->id, $USER->id, '150px', false, true);
+                $this->content->items = [$link . $progressbar . '</a>'];
+            } else {
+                $chk = new checklist_class($cm->id, $USER->id, $checklist, $cm, $COURSE);
+
+                $this->content->items = [$chk->view(true)];
+            }
         } else {
             $this->content = null;
         }

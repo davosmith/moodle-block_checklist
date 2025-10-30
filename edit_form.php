@@ -54,6 +54,9 @@ class block_checklist_edit_form extends block_edit_form {
             );
             $mform->disabledIf('config_checklistid', 'config_checklistoverview', 'eq', 1);
 
+            $mform->addElement('advcheckbox', 'config_embedchecklist', get_string('embedchecklist', 'block_checklist'));
+            $mform->disabledIf('config_embedchecklist', 'config_checklistoverview', 'eq', 1);
+
             $options = [0 => get_string('allparticipants')];
             $groups = $DB->get_records('groups', ['courseid' => $COURSE->id]);
             foreach ($groups as $group) {
